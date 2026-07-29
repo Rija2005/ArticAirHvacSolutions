@@ -1,0 +1,52 @@
+/* src/index.css */
+@import "tailwindcss";
+
+/* ✅ Fix: Standard Tailwind v4 selector for HTML class-based dark mode */
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Fonts */
+  --font-display: "Sora", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Primary Palette */
+  --color-primary-50: #e6f1fb;
+  --color-primary-100: #cce3f7;
+  --color-primary-200: #99c7ef;
+  --color-primary-500: #378ADD;
+  --color-primary-600: #185FA5;
+  --color-primary-700: #0C447C;
+  --color-primary-800: #093460;
+  --color-primary-900: #062343;
+
+  /* Accent Palette */
+  --color-accent-400: #f4b653;
+  --color-accent-500: #EF9F27;
+  --color-accent-600: #BA7517;
+
+  /* Status */
+  --color-success-500: #22c55e;
+  --color-danger-500: #ef4444;
+
+  /* Neutral */
+  --color-slate-50: #f8fafc;
+}
+
+body {
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
