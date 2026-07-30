@@ -1,13 +1,4 @@
-// // src/middleware/roleMiddleware.js
-// export const authorize = (...roles) => {
-//   return (req, res, next) => {
-//     if (!roles.includes(req.user.role)) {
-//       res.status(403);
-//       throw new Error(`Role '${req.user.role}' is not authorized for this action`);
-//     }
-//     next();
-//   };
-// };
+
 export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user?.role) {

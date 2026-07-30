@@ -1,39 +1,3 @@
-//  //src/components/Button.jsx
-
-// export default function Button({
-//   children,
-//   variant = "primary",
-//   className = "",
-//   ...props
-// }) {
-//   const base =
-//     "px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed";
-
-//   const variants = {
-//     primary:
-//       "bg-primary-700 text-white hover:bg-primary-600",
-
-//     secondary:
-//       "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100",
-
-//     accent:
-//       "bg-accent-500 text-white hover:bg-accent-600",
-
-//     outline:
-//       "border border-primary-700 text-primary-700 hover:bg-primary-50",
-//   };
-
-//   return (
-//     <button
-//       className={`${base} ${variants[variant]} ${className}`}
-//       {...props}
-//     >
-//       {children}
-//     </button>
-//    );
-// }
-
-// src/components/Button.jsx
 
 export default function Button({
   children,

@@ -1,5 +1,3 @@
-
-// src/pages/auth/ForgotPassword.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import * as yup from "yup";

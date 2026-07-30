@@ -1,5 +1,3 @@
-
-// src/pages/technician/AssignedJobs.jsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -213,49 +211,49 @@ export default function AssignedJobs() {
                       <FiInfo className="text-slate-400" /> Customer Info
                     </Button>
 
-                    {/* Status Action Button */}
-                    {j.status !== "completed" && (
-                      <Button
-                        variant="primary"
-                        disabled={isUpdating || isFutureScheduledDate}
-                        onClick={() => handleStatusUpdate(j._id, j.status)}
-                        title={
-                          isFutureScheduledDate
-                            ? `Cannot start job before scheduled date (${formatDisplayDate(scheduledDate)})`
-                            : undefined
-                        }
-                        className={`flex-1 sm:flex-initial py-2.5 px-5 text-xs font-bold rounded-xl text-white shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 ${
-                          isFutureScheduledDate
-                            ? "bg-blue-600/70 opacity-60 cursor-not-allowed shadow-none"
-                            : j.status === "in_progress"
-                            ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
-                            : "bg-blue-600 hover:bg-blue-700 shadow-blue-600/25"
-                        }`}
-                      >
-                        {isUpdating ? (
-                          <>
-                            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span>Updating...</span>
-                          </>
-                        ) : isFutureScheduledDate ? (
-                          <>
-                            <FiClock className="text-xs" />
-                            <span>Scheduled for {formatDisplayDate(scheduledDate)}</span>
-                          </>
-                        ) : j.status === "assigned" ? (
-                          <>
-                            <FiPlay className="text-xs fill-current" />
-                            <span>{nextLabel[j.status]}</span>
-                          </>
-                        ) : (
-                          <>
-                            <FiCheckCircle className="text-xs stroke-[2.5]" />
-                            <span>{nextLabel[j.status]}</span>
-                          </>
-                        )}
-                      </Button>
-                    )}
-
+                {/* Status Action Button */}
+{j.status !== "completed" && (
+  <Button
+    variant={isFutureScheduledDate ? "secondary" : "primary"}
+    disabled={isUpdating || isFutureScheduledDate}
+    onClick={() => handleStatusUpdate(j._id, j.status)}
+    title={
+      isFutureScheduledDate
+        ? `Cannot start job before scheduled date (${formatDisplayDate(scheduledDate)})`
+        : undefined
+    }
+    className={`flex-1 sm:flex-initial py-2.5 px-5 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 ${
+      isFutureScheduledDate
+        ? "!bg-amber-500/10 dark:!bg-amber-500/20 !text-amber-700 dark:!text-amber-300 !border-amber-300/70 dark:!border-amber-700/50 cursor-not-allowed opacity-100"
+        : j.status === "in_progress"
+        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20"
+        : "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
+    }`}
+  >
+    {isUpdating ? (
+      <>
+        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <span>Updating...</span>
+      </>
+    ) : isFutureScheduledDate ? (
+      <>
+        <FiClock className="text-xs text-amber-600 dark:text-amber-400" />
+        <span>Scheduled for {formatDisplayDate(scheduledDate)}</span>
+      </>
+    ) : j.status === "assigned" ? (
+      <>
+        <FiPlay className="text-xs fill-current" />
+        <span>{nextLabel[j.status]}</span>
+      </>
+    ) : (
+      <>
+        <FiCheckCircle className="text-xs stroke-[2.5]" />
+        <span>{nextLabel[j.status]}</span>
+      </>
+    )
+    }
+  </Button>
+)}
                     
                     {/* Upload Report Link */}
 {j.status === "in_progress" && (

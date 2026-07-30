@@ -1,8 +1,3 @@
-// import api from "./api";
-// export const registerUser = (data) => api.post("/auth/register", data);
-// export const loginUser = (data) => api.post("/auth/login", data);
-// export const getMe = () => api.get("/auth/me");
-// export const changePassword = (data) => api.post("/auth/change-password", data);
 
 import api from "./api";
 export const registerUser = (data) => api.post("/auth/register", data);

@@ -1,20 +1,4 @@
-// // src/layouts/DashboardLayout.jsx
-// import { Outlet } from "react-router-dom";
-// import Sidebar from "../components/Sidebar";
-// import useAuth from "../hooks/useAuth";
 
-// export default function DashboardLayout() {
-//   const { user } = useAuth();
-
-//   return (
-//     <div className="flex flex-col lg:flex-row">
-//       <Sidebar role={user?.role} />
-//       <main className="flex-1 p-6">
-//         <Outlet />
-//       </main>
-//     </div>
-//   );
-// }
 // src/layouts/DashboardLayout.jsx
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";

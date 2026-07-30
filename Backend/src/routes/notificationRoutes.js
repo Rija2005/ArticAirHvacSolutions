@@ -1,17 +1,4 @@
-// // src/routes/notificationRoutes.js
-// import express from "express";
-// import { getMyNotifications, markAsRead, getAllNotifications } from "../controllers/notificationController.js";
-// import { protect } from "../middleware/authMiddleware.js";
-// import { authorize } from "../middleware/roleMiddleware.js";
 
-// const router = express.Router();
-
-// router.get("/my", protect, getMyNotifications);
-// router.get("/", protect, authorize("admin"), getAllNotifications);
-// router.patch("/:id/read", protect, markAsRead);
-
-// export default router;
-// src/routes/notificationRoutes.js
 import express from "express";
 import { 
   getMyNotifications, 
