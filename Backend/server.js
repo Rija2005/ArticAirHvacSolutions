@@ -35,8 +35,19 @@
 // });
 
 // server.js
+
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({
+  path: path.join(__dirname, ".env"),
+});
+
+console.log("Cloud:", process.env.CLOUDINARY_CLOUD_NAME);
 import { seedAdmin } from "./src/utils/seedAdmin.js";
 import { seedServices } from "./src/utils/seedServices.js";
 import { startReminderScheduler } from "./src/utils/reminderScheduler.js";

@@ -9,8 +9,7 @@ import { notifyUser } from "./notificationController.js";
 
 export const createRequest = asyncHandler(async (req, res) => {
   let { service, description, preferredDate, priority = "normal" } = req.body;
-  const images = req.files ? req.files.map((f) => `/uploads/${f.filename}`) : [];
-
+  const images = req.files ? req.files.map((f) => f.path) : [];
   if (!service) {
     res.status(400);
     throw new Error("Service is required");

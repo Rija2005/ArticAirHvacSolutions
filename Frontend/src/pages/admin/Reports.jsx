@@ -27,7 +27,7 @@ import {
   getMaintenanceStats,
 } from "../../services/adminService";
 import { getErrorMessage, formatDate, formatStatusLabel, formatCurrency } from "../../utils/helpers";
-
+import ServiceReportViewer from "../../components/ServiceReportViewer";
 const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 // Derive the file-server origin from the configured API base (strips trailing /api)
@@ -379,71 +379,39 @@ export default function Reports() {
       </Card>
 
       <Modal
-        isOpen={reportModalOpen}
-        onClose={() => { setReportModalOpen(false); setReport(null); }}
-        title="Service Report"
-      >
-        {report && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-xs text-gray-400">Customer</p>
-                <p className="font-medium">{report.job?.request?.customer?.name || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Technician</p>
-                <p className="font-medium">{report.job?.technician?.name || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Service</p>
-                <p className="font-medium">{report.job?.request?.service?.name || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Job completion date</p>
-                <p className="font-medium">
-                  {report.job?.status === "completed" ? formatDate(report.job?.updatedAt) : "In progress"}
-                </p>
-              </div>
-            </div>
+  isOpen={reportModalOpen}
+  onClose={() => { setReportModalOpen(false); setReport(null); }}
+  title="Service Report"
+>
+  {report && (
+    <div className="space-y-5">
+      {/* 1. Job details (Customer, Tech, Service info) */}
+      <div className="grid grid-cols-2 gap-3 text-sm border-b pb-4 border-slate-100 dark:border-slate-800">
+        <div>
+          <p className="text-xs text-gray-400">Customer</p>
+          <p className="font-medium">{report.job?.request?.customer?.name || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400">Technician</p>
+          <p className="font-medium">{report.job?.technician?.name || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400">Service</p>
+          <p className="font-medium">{report.job?.request?.service?.name || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400">Job completion date</p>
+          <p className="font-medium">
+            {report.job?.status === "completed" ? formatDate(report.job?.updatedAt) : "In progress"}
+          </p>
+        </div>
+      </div>
 
-            {report.notes && (
-              <div>
-                <h3 className="font-medium mb-1">Technician Notes</h3>
-                <p className="text-sm text-gray-600">{report.notes}</p>
-              </div>
-            )}
-
-            {report.beforeImages?.length > 0 && (
-              <div>
-                <h3 className="font-medium mb-2">Before Images</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {report.beforeImages.map((img, index) => (
-                    <img key={index} src={uploadUrl(img)} alt="before" className="rounded-lg border" />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {report.afterImages?.length > 0 && (
-              <div>
-                <h3 className="font-medium mb-2">After Images</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {report.afterImages.map((img, index) => (
-                    <img key={index} src={uploadUrl(img)} alt="after" className="rounded-lg border" />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {report.customerSignature && (
-              <div>
-                <h3 className="font-medium mb-2">Customer Signature</h3>
-                <img src={report.customerSignature} alt="signature" className="border rounded-lg max-h-40" />
-              </div>
-            )}
-          </div>
-        )}
-      </Modal>
+      {/* 2. Reusable Service Report Viewer (Notes, Before/After Images, Signature) */}
+      <ServiceReportViewer report={report} />
+    </div>
+  )}
+</Modal>
     </div>
   );
 }

@@ -4,6 +4,8 @@ import Badge from "../../components/Badge";
 import Loader from "../../components/Loader";
 import Button from "../../components/Button";
 import Modal from "../../components/Modal";
+// 💡 Import reusable component
+import ServiceReportViewer from "../../components/ServiceReportViewer";
 
 import { getAllJobs } from "../../services/dispatcherService";
 import { getReportByJob } from "../../services/customerService";
@@ -43,9 +45,7 @@ export default function Scheduling() {
   const handleViewReport = async (requestId) => {
     try {
       setReportLoading(true);
-
       const res = await getReportByJob(requestId);
-
       setReport(res.data);
       setReportModal(true);
     } catch (err) {
@@ -57,12 +57,11 @@ export default function Scheduling() {
 
   if (loading) return <Loader fullScreen />;
 
-  // 🔴 Robust Day Matching Logic
   const jobsForDay = jobs.filter((j) => {
     if (!j.scheduledDate) return false;
 
     const dateObj = new Date(j.scheduledDate);
-    const dayIndex = dateObj.getDay(); // 0 is Sunday, 1 is Monday...
+    const dayIndex = dateObj.getDay();
     const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
     const jobDay = days[adjustedIndex];
 
@@ -145,6 +144,7 @@ export default function Scheduling() {
         )}
       </Card>
 
+      {/* 🚀 Updated Clean Modal */}
       <Modal
         isOpen={reportModal}
         onClose={() => {
@@ -158,74 +158,10 @@ export default function Scheduling() {
             Loading report...
           </p>
         ) : report ? (
-          <div className="space-y-5">
-            {report.notes && (
-              <div>
-                <h3 className="font-medium mb-1">
-                  Technician Notes
-                </h3>
-
-                <p className="text-sm text-gray-600 dark:text-slate-300">
-                  {report.notes}
-                </p>
-              </div>
-            )}
-
-            {report.beforeImages?.length > 0 && (
-              <div>
-                <h3 className="font-medium mb-2">
-                  Before Images
-                </h3>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {report.beforeImages.map((img, index) => (
-                    <img
-                      key={index}
-                      src={`http://localhost:5000${img}`}
-                      alt="before"
-                      className="rounded-lg border object-cover h-32 w-full"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {report.afterImages?.length > 0 && (
-              <div>
-                <h3 className="font-medium mb-2">
-                  After Images
-                </h3>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {report.afterImages.map((img, index) => (
-                    <img
-                      key={index}
-                      src={`http://localhost:5000${img}`}
-                      alt="after"
-                      className="rounded-lg border object-cover h-32 w-full"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {report.customerSignature && (
-              <div>
-                <h3 className="font-medium mb-2">
-                  Customer Signature
-                </h3>
-
-                <img
-                  src={report.customerSignature}
-                  alt="signature"
-                  className="border rounded-lg max-h-40 bg-white"
-                />
-              </div>
-            )}
-          </div>
+          <ServiceReportViewer report={report} />
         ) : (
           <p className="text-sm text-gray-500">
-            No report found.
+            No report found for this job.
           </p>
         )}
       </Modal>

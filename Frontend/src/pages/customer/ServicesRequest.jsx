@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { 
-  FiPlus, 
-  FiClock, 
-  FiCheckCircle, 
-  FiAlertCircle, 
-  FiFileText, 
-  FiStar, 
-  FiCalendar, 
+import {
+  FiPlus,
+  FiClock,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiFileText,
+  FiStar,
+  FiCalendar,
   FiSend,
   FiImage,
   FiEdit3,
@@ -27,7 +27,7 @@ import {
   getMyReviews,
   getReportByJob,
 } from "../../services/customerService";
-
+import ServiceReportViewer from "../../components/ServiceReportViewer";
 const steps = ["pending", "scheduled", "in_progress", "completed"];
 
 function StarInput({ value, onChange }) {
@@ -38,11 +38,10 @@ function StarInput({ value, onChange }) {
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className={`p-1 text-2xl transition-transform duration-200 hover:scale-115 focus:outline-none ${
-            n <= value 
-              ? "text-amber-400 dark:text-amber-400 drop-shadow-sm" 
+          className={`p-1 text-2xl transition-transform duration-200 hover:scale-115 focus:outline-none ${n <= value
+              ? "text-amber-400 dark:text-amber-400 drop-shadow-sm"
               : "text-slate-300 dark:text-slate-700 hover:text-amber-300"
-          }`}
+            }`}
           aria-label={`${n} star${n > 1 ? "s" : ""}`}
         >
           <FaStar />
@@ -59,6 +58,7 @@ export default function ServiceRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [report, setReport] = useState(null);
+  const [reportMessage, setReportMessage] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -76,8 +76,8 @@ export default function ServiceRequests() {
     }
   };
 
-  useEffect(() => { 
-    fetchData(); 
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const handleSelect = (request) => {
@@ -90,13 +90,21 @@ export default function ServiceRequests() {
   const handleCloseModal = () => {
     setSelected(null);
     setReport(null);
+    setReportMessage("");
   };
 
   const handleViewReport = async (requestId) => {
     try {
       setReportLoading(true);
+      setReport(null);
+      setReportMessage("");
+
       const res = await getReportByJob(requestId);
-      setReport(res.data);
+      if (!res.data) {
+        setReportMessage("No service report has been submitted for this request yet.");
+      } else {
+        setReport(res.data);
+      }
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -128,7 +136,7 @@ export default function ServiceRequests() {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 py-4 sm:py-6 px-3 sm:px-4 overflow-x-hidden">
-      
+
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200/60 dark:border-slate-800/80 pb-4">
         <div>
@@ -140,7 +148,7 @@ export default function ServiceRequests() {
           </p>
         </div>
         <Link to="/request-quote" className="self-start sm:self-auto">
-          <Button 
+          <Button
             variant="primary"
             className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-md shadow-primary-600/20 flex items-center gap-1.5 transition-all"
           >
@@ -206,14 +214,14 @@ export default function ServiceRequests() {
       </Card>
 
       {/* Request Details Modal */}
-      <Modal 
-        isOpen={!!selected} 
-        onClose={handleCloseModal} 
+      <Modal
+        isOpen={!!selected}
+        onClose={handleCloseModal}
         title={selected?.service?.name || "Request Details"}
       >
         {selected && (
           <div className="space-y-6 pt-2">
-            
+
             {/* Status Tracker Stepper */}
             {selected.status !== "rejected" && (
               <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800 space-y-3">
@@ -226,22 +234,20 @@ export default function ServiceRequests() {
                     const isPassed = i <= currentStep;
                     return (
                       <div key={s} className="flex items-center flex-1 last:flex-none relative">
-                        <div 
-                          className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
-                            isPassed 
-                              ? "bg-primary-600 dark:bg-primary-500 text-white shadow-sm ring-2 ring-primary-500/20" 
+                        <div
+                          className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${isPassed
+                              ? "bg-primary-600 dark:bg-primary-500 text-white shadow-sm ring-2 ring-primary-500/20"
                               : "bg-slate-200 dark:bg-slate-700"
-                          }`}
+                            }`}
                         >
                           {isPassed && <FiCheckCircle className="text-[10px]" />}
                         </div>
                         {i < steps.length - 1 && (
-                          <div 
-                            className={`flex-1 h-1 mx-1 rounded-full transition-colors ${
-                              i < currentStep 
-                                ? "bg-primary-600 dark:bg-primary-500" 
+                          <div
+                            className={`flex-1 h-1 mx-1 rounded-full transition-colors ${i < currentStep
+                                ? "bg-primary-600 dark:bg-primary-500"
                                 : "bg-slate-200 dark:bg-slate-700"
-                            }`} 
+                              }`}
                           />
                         )}
                       </div>
@@ -273,7 +279,7 @@ export default function ServiceRequests() {
             {/* Completed Job Section */}
             {selected.status === "completed" && (
               <div className="border-t border-slate-200/60 dark:border-slate-800/80 pt-5 space-y-5">
-                
+
                 {/* Review Form / Status */}
                 {alreadyReviewed ? (
                   <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
@@ -285,9 +291,9 @@ export default function ServiceRequests() {
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                       <FiStar className="text-amber-400" /> How was your service?
                     </p>
-                    
+
                     <StarInput value={rating} onChange={setRating} />
-                    
+
                     <textarea
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
@@ -296,9 +302,9 @@ export default function ServiceRequests() {
                       className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-xs sm:text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                     />
 
-                    <Button 
-                      variant="primary" 
-                      onClick={handleReviewSubmit} 
+                    <Button
+                      variant="primary"
+                      onClick={handleReviewSubmit}
                       disabled={submittingReview}
                       className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl flex items-center justify-center gap-2"
                     >
@@ -332,75 +338,14 @@ export default function ServiceRequests() {
                   </p>
                 )}
 
-                {/* Report Details Drawer / View */}
-                {report && (
-                  <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-4 shadow-sm">
-                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-                      <FiFileText className="text-primary-500" /> Technician Service Report
-                    </h3>
-
-                    {report.notes && (
-                      <div className="space-y-1">
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Technician Notes</p>
-                        <p className="text-xs text-slate-800 dark:text-slate-200 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                          {report.notes}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Before Images */}
-                    {report.beforeImages?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <FiImage /> Before Service Images
-                        </p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {report.beforeImages.map((img, index) => (
-                            <img
-                              key={index}
-                              src={`http://localhost:5000${img}`}
-                              alt="before"
-                              className="rounded-xl border border-slate-200 dark:border-slate-800 object-cover w-full h-28"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* After Images */}
-                    {report.afterImages?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <FiImage /> After Service Images
-                        </p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {report.afterImages.map((img, index) => (
-                            <img
-                              key={index}
-                              src={`http://localhost:5000${img}`}
-                              alt="after"
-                              className="rounded-xl border border-slate-200 dark:border-slate-800 object-cover w-full h-28"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Customer Signature */}
-                    {report.customerSignature && (
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <FiEdit3 /> Signed Customer Authorization
-                        </p>
-                        <img
-                          src={report.customerSignature}
-                          alt="signature"
-                          className="border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/40 p-2 max-h-36 object-contain"
-                        />
-                      </div>
-                    )}
+                {reportMessage && (
+                  <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                    {reportMessage}
                   </div>
                 )}
+
+                {/* Report Details Drawer / View */}
+                {report && <ServiceReportViewer report={report} />}
 
               </div>
             )}
