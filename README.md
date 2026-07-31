@@ -7,14 +7,14 @@ Technicians, Dispatchers, and Administrators.
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React (Vite), Tailwind CSS v4, Recharts, React Router |
-| Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
-| Auth | JWT (JSON Web Tokens), bcrypt password hashing |
-| Email | Nodemailer (password reset flow) |
-| File uploads | Multer (service request photos, before/after job photos) |
+| Layer        | Technology                                                        |
+| ------------ | ------------------------------------------------------------------ |
+| Frontend     | React (Vite), Tailwind CSS v4, Recharts, React Router              |
+| Backend      | Node.js, Express.js                                                |
+| Database     | MongoDB, Mongoose                                                  |
+| Auth         | JWT (JSON Web Tokens), bcrypt password hashing                     |
+| Email        | Nodemailer (password reset flow)                                   |
+| File uploads | Multer (handles incoming multipart requests) + Cloudinary (stores request photos, before/after job photos, and signatures in the cloud) |
 
 ## Project Structure
 
@@ -24,6 +24,7 @@ Technicians, Dispatchers, and Administrators.
 │   └── src/
 │       ├── app.js              # Express app + route mounting
 │       ├── config/db.js        # MongoDB connection
+│       ├── config/cloudinary.js # Cloudinary SDK configuration
 │       ├── models/             # Mongoose schemas
 │       ├── controllers/        # business logic
 │       ├── routes/             # API route definitions
@@ -40,30 +41,30 @@ Technicians, Dispatchers, and Administrators.
         │   └── auth/
         ├── components/          # shared UI components
         ├── context/             # AuthContext, ThemeContext
-        ├── hooks/                # useAuth, useTheme
-        ├── services/             # API call wrappers, grouped by role
-        ├── layouts/              # PublicLayout, AuthLayout, DashboardLayout
-        └── routes/AppRoutes.jsx  # all route definitions
+        ├── hooks/               # useAuth, useTheme
+        ├── services/            # API call wrappers, grouped by role
+        ├── layouts/             # PublicLayout, AuthLayout, DashboardLayout
+        └── routes/AppRoutes.jsx # all route definitions
 ```
 
 ## User Roles & What They Can Do
 
 - **Guest** — browse services, request a quote, book inspections, view service areas, register
 - **Customer** — request services, accept/reject quotations, view invoices, track technician
-  visits, view maintenance history, renew maintenance contracts
+  visits, view maintenance history, renew maintenance contracts, leave a review
 - **Technician** — view assigned jobs, update job status, upload service reports (before/after
   photos, notes, customer signature), mark jobs complete
 - **Dispatcher** — assign technicians, schedule appointments, track availability, manage
   emergency requests
 - **Administrator** — manage customers/technicians/dispatchers, manage quotations, generate
-  invoices, configure maintenance plans, view analytics & reports
+  invoices, configure maintenance plans, moderate reviews, view analytics & reports
 
 ## Core Modules
 
 1. **Corporate website** — Home, About, Services, Maintenance Plans, Emergency Services,
    Testimonials, Service Areas, Request Quote, Contact, FAQ
 2. **Service Request Management** — installation/repair/inspection requests, preferred date,
-   photo uploads, status tracking
+   photo uploads, status tracking, emergency priority flag
 3. **Quotation Management** — labor/equipment costs, tax, discount, customer accept/reject
 4. **Technician Dashboard** — daily schedule, job status updates, service reports
 5. **Dispatcher Dashboard** — technician assignment, scheduling, emergency request handling
@@ -73,16 +74,20 @@ Technicians, Dispatchers, and Administrators.
    performance, customer growth, most-requested services, maintenance contract statistics
 9. **Notifications** — service request confirmation, technician assignment, appointment
    reminders, quotation approval, invoice generated, maintenance due reminders
+10. **Reviews** — post-completion customer ratings, admin-moderated before appearing on the
+    public Testimonials page
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - A MongoDB connection string (local or Atlas)
+- A Cloudinary account (free tier is enough) — for image uploads
 
 ### Backend setup
 
-```bash
+```
 cd Backend
 npm install
 ```
@@ -94,7 +99,7 @@ MONGO_URI=your-mongodb-connection-string
 JWT_SECRET=your-jwt-secret
 PORT=5000
 
-# Password reset emails (see Backend/src/utils/sendEmail.js)
+# Password reset emails
 SMTP_HOST=sandbox.smtp.mailtrap.io
 SMTP_PORT=2525
 SMTP_USER=your-smtp-username
@@ -104,20 +109,25 @@ SMTP_FROM_EMAIL=no-reply@arcticair-hvac.com
 
 # Used to build the password-reset link sent by email
 CLIENT_URL=http://localhost:5173
+
+# Cloudinary — image storage for service request photos, before/after job
+# photos, and customer signatures (find these in your Cloudinary dashboard)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
 
 Run it:
 
-```bash
+```
 npm run dev
 ```
 
-On first boot, the server seeds a default admin account and the base service catalog
-(see `Backend/src/utils/seedAdmin.js` and `seedServices.js`).
+On first boot, the server seeds a default admin account and the base service catalog.
 
 ### Frontend setup
 
-```bash
+```
 cd Frontend
 npm install
 ```
@@ -130,7 +140,7 @@ VITE_API_URL=http://localhost:5000/api
 
 Run it:
 
-```bash
+```
 npm run dev
 ```
 
@@ -138,22 +148,35 @@ The app runs at `http://localhost:5173`.
 
 ## Key Features Beyond the Base Spec
 
-- **Forgot/reset password** for all four roles, with hashed reset tokens and expiry
-- **Light/dark mode** toggle, persisted per user
-- **Automated reminder system** — checks hourly for upcoming appointments (24h out) and
-  maintenance renewals (7 days out) and notifies customers automatically
-- **Consistent notification triggers** across the request → quotation → job → invoice lifecycle
+- Forgot/reset password for all four roles, with hashed reset tokens and expiry
+- Light/dark mode toggle, persisted per user
+- Automated reminder system — hourly checks for upcoming appointments and maintenance renewals
+- Instant estimate calculator on the homepage
+- Customer review/testimonial system with admin moderation
+- Cloud-based image storage via Cloudinary — images aren't tied to local server disk, which
+  also means the backend can be deployed to platforms without persistent storage (Render,
+  Railway, Hugging Face Spaces, etc.) without losing uploaded photos on restart
 
-## Known Gaps / Next Steps
+## Future Scope
 
-- Contact page form is currently UI-only (doesn't send anywhere yet)
-- Maintenance contracts don't yet auto-flip to `"expired"` status once the renewal date passes
-- Dark mode currently covers the dashboard/sidebar side of the app, not yet the public
-  marketing pages
-- No live deployment configured yet (see `Bonus Features` in the project brief for optional
-  hosting on Vercel / Hostinger)
+The following are not part of the current build but are natural next steps — this also
+reflects the optional bonus features from the original project brief that haven't been
+implemented yet:
+
+- Online payment integration (Stripe / PayPal) — invoices/payments are currently manual/UI-based only
+- Technician live location tracking (real-time GPS)
+- SMS notifications — current notification system covers in-app and email (password reset) only
+- Full email automation — Nodemailer currently covers password reset only; other events
+  (invoice generated, appointment reminders, quotation approval) are not yet emailed
+- Production-grade customer signature capture — service reports currently use a tap-to-confirm
+  placeholder, not a real canvas-based freehand signature
+- AI service recommendation assistant
+- AI quotation generator
+- Contact page form connected to a live email/notification endpoint
+- Automatic maintenance contract expiry once the renewal date passes (currently manual)
 
 ## Documentation
 
-- ER Diagram — see project documentation folder
-- System Flow Diagram — see project documentation folder
+- ER Diagram — see `/docs` folder
+- System Flow Diagram — see `/docs` folder
+- Full Project Documentation — see `ArcticAir_Project_Documentation.docx`
