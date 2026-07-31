@@ -1,3 +1,4 @@
+
 // // src/app.js — full updated version
 // import express from "express";
 // import cors from "cors";
@@ -35,11 +36,11 @@
 // app.use("/api/analytics", analyticsRoutes);
 // app.use("/api/services", serviceRoutes);
 // app.use("/api/reviews", reviewRoutes);
-// app.use("/uploads", express.static("uploads"));
 // app.use(notFound);
 // app.use(errorHandler);
 
 // export default app;
+
 
 // src/app.js — full updated version
 import express from "express";
@@ -58,6 +59,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
  import reviewRoutes from "./routes/reviewRoutes.js";
+import cronRoutes from "./routes/cronRoutes.js";
 const app = express();
 
 app.use(cors());
@@ -78,6 +80,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/cron", cronRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

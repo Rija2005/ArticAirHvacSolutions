@@ -41,7 +41,6 @@ if (hasCloudinaryConfig) {
     },
   });
 }
-
 const fileFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|webp/;
   const isValid = allowed.test(path.extname(file.originalname).toLowerCase());

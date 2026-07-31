@@ -52,12 +52,20 @@ const sendMaintenanceReminders = async () => {
   }
 };
 
-// Runs both checks once, then every hour. Called once from server.js on boot.
+// Runs both reminder checks once. Used by the Vercel cron endpoint (once/day)
+// and by the local setInterval loop below (hourly, for traditional servers).
+export const runReminderChecks = async () => {
+  await sendAppointmentReminders();
+  await sendMaintenanceReminders();
+};
+
+// Local/traditional-server mode only — NOT used on Vercel (serverless functions
+// can't keep a setInterval alive between requests). On Vercel, runReminderChecks
+// is instead called once/day via a Vercel Cron Job hitting /api/cron/reminders.
 export const startReminderScheduler = () => {
   const run = async () => {
     try {
-      await sendAppointmentReminders();
-      await sendMaintenanceReminders();
+      await runReminderChecks();
     } catch (err) {
       console.error("[REMINDER SCHEDULER ERROR]", err.message);
     }
