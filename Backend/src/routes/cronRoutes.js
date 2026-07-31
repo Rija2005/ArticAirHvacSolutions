@@ -4,13 +4,22 @@ import { runReminderChecks } from "../utils/reminderScheduler.js";
 
 const router = express.Router();
 
-// @route GET /api/cron/reminders
-// Called once/day by Vercel Cron (see vercel.json). Vercel automatically sends
-// an `Authorization: Bearer <CRON_SECRET>` header — we verify it so this
-// endpoint can't be triggered by anyone who just finds the URL.
+// @route GET /api/cron/reminders?secret=...
+// Can be triggered two ways:
+//  1. Vercel Cron (if you set it up in vercel.json + a CRON_SECRET env var) —
+//     Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically.
+//  2. An external scheduler like cron-job.org — hits the URL with
+//     `?secret=<CRON_SECRET>` appended, since free external schedulers don't
+//     always support custom headers.
 router.get("/reminders", async (req, res) => {
+  const expected = process.env.CRON_SECRET;
   const authHeader = req.headers.authorization;
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const querySecret = req.query.secret;
+
+  const authorized =
+    !expected || authHeader === `Bearer ${expected}` || querySecret === expected;
+
+  if (!authorized) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
